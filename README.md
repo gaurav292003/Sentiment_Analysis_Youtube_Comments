@@ -1,21 +1,63 @@
-we used YouTube Data API (google-api-python-client) to fetch comments from a specified YouTube video. After importing necessary libraries and initializing the YouTube API client with an API key, the `get_comments` function is defined to retrieve comments iteratively, handling pagination with `next_page_token`. Each comment's text, author, and publication date are extracted and stored in a list. The gathered comments are then converted into a pandas DataFrame for easy manipulation and analysis. Finally, the DataFrame is printed and saved to a CSV file named `youtube_comments.csv`. This enables efficient storage and review of YouTube video comments.
-we used Spark script orchestrates a comprehensive pipeline for YouTube comment processing. It commences by initializing a Spark session and loading comment data from a CSV file, followed by schema inspection for data structure comprehension.
+Sentiment Analysis 
 
-For data cleaning, a custom UDF, `clean_comment`, is implemented to strip HTML tags and decode entities from comments. This function is registered and applied, resulting in a new column `cleaned_comment`.
+Overview
+This project demonstrates sentiment analysis using a Multinomial Naive Bayes classifier on a dataset of comments. The goal is to classify comments into positive, negative, or neutral sentiments based on their content.
 
-Subsequently, the `Tokenizer` from Spark's MLlib segments comments into individual words, forming a `words` column. Then, the `StopWordsRemover` filters out common stop words, generating a `filtered_words` column.
+ Dataset
+The dataset used (`Comments.csv`) contains comments with associated sentiment labels.
 
-Further transformations include joining elements of `filtered_words` into a single string in `filtered_words_str`, followed by deduplication to ensure unique records.
+Steps Performed:
+1. Data Preprocessing:
+   - Loaded the dataset using Pandas.
+   - Handled missing values and class imbalance by sampling equal numbers of instances from each sentiment class.
 
-Processed data, enriched with author details, original comments, filtered words, and publication dates, is stored in a new CSV file. Existing output directories are removed beforehand to prevent conflicts.
+2. Exploratory Data Analysis:
+   - Visualized the distribution of sentiments before and after balancing.
+   - Created a word cloud to visualize frequently occurring words in the comments.
 
-Throughout the process, the script monitors record counts at each stage—initial load, after cleaning, tokenization, stop word removal, and final deduplication—to validate data integrity and track transformation effectiveness. This pipeline enhances data quality, facilitating subsequent analysis tasks like sentiment analysis or trend identification.
-2 we have also worked with  spark script demonstrates a thorough workflow for analyzing sentiment in YouTube comments using Apache Spark and NLTK's VADER sentiment analysis tool. Initially, the processed YouTube comments are loaded into a DataFrame, where their schema and a sample of rows are inspected to verify data integrity.
+3. Text Preprocessing:
+   - Cleaned the comments by removing stopwords, punctuation, and lemmatizing the text using spaCy.
 
-Next, NLTK's VADER lexicon is downloaded and utilized to initialize a sentiment intensity analyzer (`sid`). A user-defined function (UDF), `analyze_sentiment`, applies VADER to classify each comment's sentiment as positive, negative, or neutral based on its compound score. This sentiment analysis is then applied to the DataFrame, creating a new column `sentiment`.
+4. Feature Extraction:
+   - Used spaCy's pretrained model (`en_core_web_lg`) to convert cleaned text into numerical vectors.
 
-The script aggregates sentiment counts by grouping the DataFrame based on sentiment classifications (`positive`, `negative`, `neutral`). Visualizations are created using seaborn and matplotlib, showcasing sentiment distribution across YouTube comments through bar plots and sentiment score histograms.
+5. Model Training:
+   - Split the data into training and testing sets.
+   - Applied MinMax scaling to the numerical vectors.
+   - Trained a Multinomial Naive Bayes classifier on the scaled training data.
 
-Moreover, a function `get_sentiment_score` computes the sentiment score for each comment, which represents the overall sentiment intensity. This score distribution is visualized to depict the spread and intensity of sentiments within the dataset.
+6. Model Evaluation:
+   - Evaluated the model using classification metrics such as precision, recall, and F1-score.
+   - Plotted a confusion matrix and visualized the true vs predicted sentiment distributions.
 
-Overall, the script provides comprehensive sentiment analysis capabilities for YouTube comments, facilitating deeper insights into audience opinions and emotional responses.
+7. Model Persistence:
+   - Saved the trained classifier using joblib (`model.joblib`).
+
+Requirements
+- Python 3
+- Libraries: pandas, matplotlib, seaborn, wordcloud, spacy, sklearn
+
+Usage
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/sentiment-analysis.git
+   cd sentiment-analysis
+   ```
+   
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+   
+3. Run the notebook or script to reproduce the analysis:
+   ```
+   jupyter notebook SentimentAnalysis.ipynb
+   ```
+   
+4. Modify paths or parameters as needed for your dataset or environment.
+
+ Files Included
+- `SentimentAnalysis.ipynb`: Jupyter notebook containing the complete analysis workflow.
+- `Comments.csv`: Dataset file containing comments and sentiment labels.
+- `model.joblib`: Pre-trained Multinomial Naive Bayes classifier saved for reuse.
+
